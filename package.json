@@ -1,0 +1,29 @@
+{
+  "name": "@rainder/request-response-wrapper",
+  "version": "0.1.0",
+  "description": "Generic request/response wrapper",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainder/node-request-response-wrapper.git"
+  },
+  "keywords": [
+    "request",
+    "response",
+    "wrapper",
+    "udp",
+    "tcp",
+    "duplex"
+  ],
+  "author": "Andrius Skerla",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rainder/node-request-response-wrapper/issues"
+  },
+  "homepage": "https://github.com/rainder/node-request-response-wrapper#readme"
+}
