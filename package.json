@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "description": "Generic request/response wrapper",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "objectid": "^3.2.1",
+    "skerla-callbacks": "^0.1.3"
+  },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
