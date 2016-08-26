@@ -34,8 +34,6 @@ socketServer.on('data', (data, connection) => {
 
 See sample.js for example
 
-
-
 ## API
 
 ### request(data, ...args): Promise
