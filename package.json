@@ -4,7 +4,7 @@
   "description": "Generic request/response wrapper",
   "main": "index.js",
   "dependencies": {
-    "@rainder/callbacks": "^0.2.1",
+    "@rainder/callbacks": "^0.2.2",
     "bson": "^0.5.4"
   },
   "devDependencies": {},

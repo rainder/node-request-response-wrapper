@@ -1,6 +1,5 @@
 'use strict';
 
-const co = require('co');
 const net = require('net');
 const RequestResponseWrapper = require('./index');
 
@@ -23,7 +22,7 @@ const server = (function () {
           return resolve(new Buffer(JSON.stringify(result)));
         }
 
-        reject(`unknown method specified: ${message.method}`);
+        reject(new Buffer(`unknown method specified: ${message.method}`));
       })
     }
 
@@ -55,7 +54,7 @@ const client = (function () {
     }
 
     onPush(data, connection) {
-      console.log('got push from the server', data);
+      console.log('got push from the server', data.toString('utf8'));
     }
   };
 
@@ -68,21 +67,23 @@ const client = (function () {
 
 const methods = {
   'get-user': (data) => ({ name: 'John', age: data.age })
-}
+};
 
-co(function *() {
+(function () {
   const payload = new Buffer(JSON.stringify({
     method: 'get-user',
     data: { age: 27 }
   }));
 
-  const r1 = yield client.request(payload, { timeout: 1000 });
+  client.request(payload, { timeout: 1000 })
+    .then(response => {
+      const jsonResponse = JSON.parse(response);
 
-  const jsonResponse = JSON.parse(r1);
+      console.log('response', jsonResponse);
+      console.assert(jsonResponse.name === 'John');
+      console.assert(jsonResponse.age === 27);
+    })
+    .catch(e => console.error(e));
 
-  console.log('response', jsonResponse);
-  console.assert(jsonResponse.name === 'John');
-  console.assert(jsonResponse.age === 27);
-
-}).catch(e => console.error(e));
+})();
 
