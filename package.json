@@ -4,8 +4,8 @@
   "description": "Generic request/response wrapper",
   "main": "index.js",
   "dependencies": {
-    "objectid": "^3.2.1",
-    "skerla-callbacks": "^0.1.3"
+    "@rainder/callbacks": "^0.2.1",
+    "bson": "^0.5.4"
   },
   "devDependencies": {},
   "scripts": {

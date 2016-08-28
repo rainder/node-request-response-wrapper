@@ -1,8 +1,12 @@
 'use strict';
 
-const objectid = require('objectid');
-const Callbacks = require('skerla-callbacks');
+const bson = require('bson');
+const Callbacks = require('@rainder/callbacks');
 const events = require('events');
+const constructor = require('./lib/constructor');
+const Request = require('./lib/request');
+const Response = require('./lib/response');
+const Push = require('./lib/push');
 
 module.exports = class RequestResponseWrapper extends events {
   /**
@@ -12,8 +16,8 @@ module.exports = class RequestResponseWrapper extends events {
    */
   constructor() {
     super();
-    
-    this.callbacks = new Callbacks();
+
+    this.callbacks = new Callbacks('RequestResponseWrapper');
   }
 
   /**
@@ -22,18 +26,13 @@ module.exports = class RequestResponseWrapper extends events {
    * @param args
    * @returns {*}
    */
-  request(data, ...args) {
-    const payload = {
-      id: objectid().toString(),
-      type: 'request',
-      data: data
-    };
+  request(data, options = {}, ...args) {
+    const id = bson.ObjectId().id;
+    const payload = new Request(id, data).toBuffer();
 
     return this
       .send(payload, ...args)
-      .then(() => this.callbacks.create({
-        id: payload.id
-      }));
+      .then(() => this.callbacks.create(id.toString('hex'), options.timeout));
   }
 
   /**
@@ -42,58 +41,56 @@ module.exports = class RequestResponseWrapper extends events {
    * @param args
    * @returns {*}
    */
-  push(data, ...args) {
-    const payload = {
-      type: 'push',
-      data: data
-    };
-
+  push(data, options = {}, ...args) {
+    const payload = new Push(data).toBuffer();
     return this.send(payload, ...args);
   }
 
   /**
    *
-   * @param id
+   * @param id {Buffer}
    * @param success
    * @param data
    * @param args
    * @returns {*}
    */
   response(id, success, data, ...args) {
-    const payload = {
-      id,
-      type: 'response',
-      success,
-      data
-    };
-
+    const payload = new Response(id, success, data).toBuffer();
     return this.send(payload, ...args);
   }
 
   /**
    *
-   * @param data
+   * @param buffer
    * @param args
    * @returns {boolean}
    */
-  incomingMessage(data, ...args) {
-    if (data.type === 'request') {
-      this.onRequest(data.data, ...args)
-        .then((result) => this.response(data.id, true, result, ...args))
-        .catch((err) => this.response(data.id, false, err, ...args))
-        .catch((err) => console.error(err));
+  incomingMessage(buffer, ...args) {
+    const message = constructor(buffer);
+
+    if (message instanceof Request) {
+      this.onRequest(message.data, ...args)
+        .then((result) => this.response(message.id, true, result, ...args))
+        .catch((err) => this.response(message.id, false, err, ...args))
+        .catch((err) => console.error('Error:', err));
     }
 
-    if (data.type === 'response') {
-      if (data.success) {
-        return this.callbacks.success(data.id, data.data);
+    if (message instanceof Response) {
+      const id = message.id.toString('hex');
+      const callback = this.callbacks.getCallback(id);
+      if (!callback) {
+        throw new Error(`Unknown response id: ${id}`);
       }
 
-      return this.callbacks.fail(data.id, data.data);
+      if (message.success) {
+        callback.resolve(message.data);
+      } else {
+        callback.reject(message.data);
+      }
     }
 
-    if (data.type === 'push') {
-      this.onPush(data.data, ...args);
+    if (message instanceof Push) {
+      this.onPush(message.data, ...args);
     }
   }
 
