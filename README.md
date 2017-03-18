@@ -27,7 +27,7 @@ const wrapper = new class extends RequestResponseWrapper {
 }
 
 socketServer.on('data', (data, connection) => {
-  wrapper.incommingMessage(data, connection);
+  wrapper.receive(data, connection);
 });
 
 ```
@@ -36,10 +36,11 @@ See sample.js for example
 
 ## API
 
+### receive(data, ...args): Promise
+### send(data, ...args): Promise
+
 ### request(data, ...args): Promise
 ### push(data, ...args): Promise
-### incomingMessage(data, ...args): Promise
 
-### send(data, ...args): Promise
 ### onPush(data, ...args): void
 ### onRequest(data, ...args): void
