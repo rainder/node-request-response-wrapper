@@ -1,12 +1,16 @@
 'use strict';
 
 const net = require('net');
-const RequestResponseWrapper = require('./index');
+const RequestResponseWrapper = require('./');
 
 const server = (function () {
 
   const server = net.createServer();
   server.listen(7878);
+
+  const methods = {
+    'get-user': (data) => ({ name: 'John', age: 27 })
+  };
 
   const app = new class extends RequestResponseWrapper {
     onRequest(message, connection) {
@@ -35,7 +39,7 @@ const server = (function () {
 
   server.on('connection', (connection) => {
     connection.on('data', (data) => {
-      app.incomingMessage(data, connection);
+      app.receive(data, connection);
     });
   });
 
@@ -59,20 +63,14 @@ const client = (function () {
   };
 
   connection.on('data', (data) => {
-    app.incomingMessage(data, connection);
+    app.receive(data, connection);
   });
 
   return app;
 })();
-
-const methods = {
-  'get-user': (data) => ({ name: 'John', age: data.age })
-};
-
 (function () {
   const payload = new Buffer(JSON.stringify({
-    method: 'get-user',
-    data: { age: 27 }
+    method: 'get-user'
   }));
 
   client.request(payload, { timeout: 1000 })

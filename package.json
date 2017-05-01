@@ -2,7 +2,7 @@
   "name": "@rainder/request-response-wrapper",
   "version": "0.3.2",
   "description": "Generic request/response wrapper",
-  "main": "index.js",
+  "main": "./lib/request-response-wrapper.js",
   "dependencies": {
     "@rainder/callbacks": "^0.3.2",
     "@splytech-io/eslint-config": "0.0.3",
