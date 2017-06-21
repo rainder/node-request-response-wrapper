@@ -1,6 +1,6 @@
 {
   "name": "@rainder/request-response-wrapper",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Generic request/response wrapper",
   "main": "./lib/request-response-wrapper.js",
   "dependencies": {
